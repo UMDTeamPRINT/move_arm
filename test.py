@@ -83,6 +83,8 @@ def main():
                                                    queue_size=20)
   #go_to_joint_state(move_group)
   go_to_pose_goal(move_group)
+
+  #adds floor for planning. Needs to be run once on initialization
   #add_box(scene,robot)
 
 if __name__ == '__main__':
