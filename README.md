@@ -57,3 +57,6 @@ rosdep install --rosdistro $ROS_DISTRO --ignore-src --from-paths src
 Now to run it, use:
 
 ```rosrun move_arm test.py```
+
+## Refrences:
+test.py references [Example MoveIt Code](https://github.com/ros-planning/moveit_tutorials/blob/master/doc/move_group_python_interface/scripts/move_group_python_interface_tutorial.py)
