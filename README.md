@@ -36,3 +36,17 @@ connect to ros and run:
 
 You now have a working simulation with motion planning! :D
 
+## To run:
+After the previous stuff is running, you can clone this package with:
+```
+cd ~/catkin_ws/src
+git clone https://github.com/UMDTeamPRINT/move_arm.git
+```
+To install dependencies run:
+```cd ~/catkin_ws/
+rosdep update
+rosdep install --rosdistro $ROS_DISTRO --ignore-src --from-paths src
+```
+
+Now to run it, use:
+```rosrun move_arm test.py```
