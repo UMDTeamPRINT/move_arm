@@ -5,6 +5,7 @@ import rospy
 import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
+import argparse
 from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
@@ -55,12 +56,15 @@ def go_to_joint_state(move_group):
   move_group.go(joint_goal, wait=True)
   move_group.stop()
 
-def go_to_pose_goal(move_group):
-  pose_goal = geometry_msgs.msg.Pose()
-  pose_goal.position.x=0
-  pose_goal.position.y=0.4
-  pose_goal.position.z=.5
-  pose_goal.orientation.w=0
+def go_to_pose_goal(move_group, desired_cart_pos, desired_rot):
+  # pose_goal = geometry_msgs.msg.Pose()
+  # pose_goal.position.x= desired_cart_pos['x']
+  # pose_goal.position.y= desired_cart_pos['y']
+  # pose_goal.position.z= desired_cart_pos['z']
+  # pose_goal.orientation.w=0
+
+  # the pose target should be able to accept a list of 6 floats
+  pose_goal = desired_cart_pos.values().append(desired_rot.values())
 
   move_group.set_pose_target(pose_goal)
 
@@ -68,7 +72,7 @@ def go_to_pose_goal(move_group):
   move_group.stop()
   move_group.clear_pose_targets()
 
-def main():
+def main(args):
   moveit_commander.roscpp_initialize(sys.argv)
   rospy.init_node('move_group_python_interface_tutorial', anonymous=True)
 
@@ -82,10 +86,21 @@ def main():
                                                    moveit_msgs.msg.DisplayTrajectory,
                                                    queue_size=20)
   #go_to_joint_state(move_group)
-  go_to_pose_goal(move_group)
+  desired_cart_pos = {'x':args.pos[0], 'y':args.pos[1], 'z':args.pos[2]}
+
+  if hasattr(args, 'rot'):
+    desired_rot = {'rot_x':args.pos[0], 'rot_y':args.pos[1], 'rot_z':args.pos[2]}
+    go_to_pose_goal(move_group, desired_cart_pos, desired_rot)
+  else:
+    desired_rot = {'rot_x':0, 'rot_y':0, 'rot_z':0}
+    go_to_pose_goal(move_group, desired_cart_pos, desired_rot)
 
   #adds floor for planning. Needs to be run once on initialization
   #add_box(scene,robot)
 
 if __name__ == '__main__':
-  main()
+  parser = argparse.ArgumentParser(description="Train or Use the Network?")
+  parser.add_argument('--pos', type=float, nargs=3)
+  parser.add_argument('--rot', type=float, nargs=3)
+  args = parser.parse_args()
+  main(args)
