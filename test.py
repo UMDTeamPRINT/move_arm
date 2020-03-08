@@ -47,6 +47,13 @@ def add_floor(scene, robot, timeout=4):
   
   rospy.sleep(2)
 
+def display_trajectory(robot, display_trajectory_publisher, plan):
+  display_trajectory = moveit_msgs.msg.DisplayTrajectory()
+  display_trajectory.trajectory_start = robot.get_current_state()
+  display_trajectory.trajectory.append(plan)
+  # Publish
+  display_trajectory_publisher.publish(display_trajectory);
+
 def go_to_joint_state(move_group):
   joint_goal = move_group.get_current_joint_values()
   joint_goal[0] = pi/2
@@ -59,7 +66,7 @@ def go_to_joint_state(move_group):
   move_group.go(joint_goal, wait=True)
   move_group.stop()
 
-def go_to_pose_goal(move_group, desired_cart_pos, desired_rot):
+def go_to_pose_goal(robot, display_trajectory_publisher, move_group, desired_cart_pos, desired_rot):
   pose_goal = geometry_msgs.msg.Pose()
   pose_goal.position.x= desired_cart_pos['x']
   pose_goal.position.y= desired_cart_pos['y']
@@ -71,6 +78,8 @@ def go_to_pose_goal(move_group, desired_cart_pos, desired_rot):
   pose_goal.orientation.z= desired_rot['rot_z']
 
   move_group.set_pose_target(pose_goal)
+
+  display_trajectory(robot, display_trajectory_publisher, pose_goal)
 
   plan=move_group.go(wait=True)
   move_group.stop()
@@ -95,14 +104,17 @@ def main(args):
   
   desired_cart_pos = {'x':args.pos[0], 'y':args.pos[1], 'z':args.pos[2]}
 
+  desired_rot = {}
+
   if hasattr(args, 'rot'):
     quat = tf.transformations.quaternion_from_euler(args.rot[0],args.rot[1],args.rot[2])
     desired_rot = {'rot_x':quat[0], 'rot_y':quat[1], 'rot_z':quat[2], 'rot_w':quat[3]}
-    go_to_pose_goal(move_group, desired_cart_pos, desired_rot)
+    
   else:
     quat = tf.transformations.quaternions_from_euler(0,0,0)
     desired_rot = {'rot_x':quat[0], 'rot_y':quat[1], 'rot_z':quat[2], 'rot_w':quat[3]}
-    go_to_pose_goal(move_group, desired_cart_pos, desired_rot)
+  
+  go_to_pose_goal(robot, display_trajectory_publisher, move_group, desired_cart_pos, desired_rot)
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description="Train or Use the Network?")
