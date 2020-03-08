@@ -74,7 +74,7 @@ class Planner(object):
 
             waypoints.append(copy.deepcopy(pose))
 
-        (plan, fraction) = self.move_group.compute_cartesian_path(waypoints, 0.01, 0)
+        (plan, fraction) = self.move_group.compute_cartesian_path(waypoints, 0.001, 0)
 
         return plan, fraction
 
@@ -92,7 +92,7 @@ def main():
 
     planner.add_floor()
 
-    plan_file = "/home/froppy/listofcoords"
+    plan_file = "listofcoords"
 
     plan, fraction = planner.create_plan(plan_file)
 
