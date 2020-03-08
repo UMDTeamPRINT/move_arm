@@ -33,7 +33,7 @@ def all_close(goal, actual, tolerance):
 
   return True
 
-def add_box(scene, robot, timeout=4):
+def add_floor(scene, robot, timeout=4):
   rospy.sleep(2)
 
   box_name="floor"
@@ -83,7 +83,8 @@ def main(args):
   robot = moveit_commander.RobotCommander()
   scene = moveit_commander.PlanningSceneInterface()
 
-  add_box(scene,robot)
+  # Add/update floor before running planning
+  add_floor(scene,robot)
 
   group_name = "manipulator"
   move_group = moveit_commander.MoveGroupCommander(group_name)
@@ -91,7 +92,7 @@ def main(args):
   display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
                                                    moveit_msgs.msg.DisplayTrajectory,
                                                    queue_size=20)
-  #go_to_joint_state(move_group)
+  
   desired_cart_pos = {'x':args.pos[0], 'y':args.pos[1], 'z':args.pos[2]}
 
   if hasattr(args, 'rot'):
@@ -102,8 +103,6 @@ def main(args):
     quat = tf.transformations.quaternions_from_euler(0,0,0)
     desired_rot = {'rot_x':quat[0], 'rot_y':quat[1], 'rot_z':quat[2], 'rot_w':quat[3]}
     go_to_pose_goal(move_group, desired_cart_pos, desired_rot)
-
-  #adds floor for planning. Needs to be run once on initialization
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description="Train or Use the Network?")
