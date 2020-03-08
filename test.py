@@ -9,6 +9,7 @@ import argparse
 from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
+import tf
 
 def all_close(goal, actual, tolerance):
   """
@@ -57,14 +58,20 @@ def go_to_joint_state(move_group):
   move_group.stop()
 
 def go_to_pose_goal(move_group, desired_cart_pos, desired_rot):
-  # pose_goal = geometry_msgs.msg.Pose()
-  # pose_goal.position.x= desired_cart_pos['x']
-  # pose_goal.position.y= desired_cart_pos['y']
-  # pose_goal.position.z= desired_cart_pos['z']
-  # pose_goal.orientation.w=0
+  pose_goal = geometry_msgs.msg.Pose()
+  pose_goal.position.x= desired_cart_pos['x']
+  pose_goal.position.y= desired_cart_pos['y']
+  pose_goal.position.z= desired_cart_pos['z']
+  
+  quat = tf.transformations.quaternion_from_euler(desired_rot['rot_x'],desired_rot['rot_y'],desired_rot['rot_z'])
+
+  pose_goal.orientation.w= quat[0]
+  pose_goal.orientation.x= quat[1]
+  pose_goal.orientation.y= quat[2]
+  pose_goal.orientation.z= quat[3]
 
   # the pose target should be able to accept a list of 6 floats
-  pose_goal = desired_cart_pos.values().append(desired_rot.values())
+  # pose_goal = desired_cart_pos.values().append(desired_rot.values())
 
   move_group.set_pose_target(pose_goal)
 
@@ -89,7 +96,7 @@ def main(args):
   desired_cart_pos = {'x':args.pos[0], 'y':args.pos[1], 'z':args.pos[2]}
 
   if hasattr(args, 'rot'):
-    desired_rot = {'rot_x':args.pos[0], 'rot_y':args.pos[1], 'rot_z':args.pos[2]}
+    desired_rot = {'rot_x':args.rot[0], 'rot_y':args.rot[1], 'rot_z':args.rot[2]}
     go_to_pose_goal(move_group, desired_cart_pos, desired_rot)
   else:
     desired_rot = {'rot_x':0, 'rot_y':0, 'rot_z':0}
