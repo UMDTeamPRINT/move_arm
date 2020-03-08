@@ -44,6 +44,8 @@ def add_box(scene, robot, timeout=4):
   box_pose.pose.position.y=0
   box_pose.pose.position.x=0
   scene.add_box(box_name,box_pose,size=(5,5,.01))
+  
+  rospy.sleep(2)
 
 def go_to_joint_state(move_group):
   joint_goal = move_group.get_current_joint_values()
@@ -62,16 +64,11 @@ def go_to_pose_goal(move_group, desired_cart_pos, desired_rot):
   pose_goal.position.x= desired_cart_pos['x']
   pose_goal.position.y= desired_cart_pos['y']
   pose_goal.position.z= desired_cart_pos['z']
-  
-  quat = tf.transformations.quaternion_from_euler(desired_rot['rot_x'],desired_rot['rot_y'],desired_rot['rot_z'])
 
-  pose_goal.orientation.w= quat[0]
-  pose_goal.orientation.x= quat[1]
-  pose_goal.orientation.y= quat[2]
-  pose_goal.orientation.z= quat[3]
-
-  # the pose target should be able to accept a list of 6 floats
-  # pose_goal = desired_cart_pos.values().append(desired_rot.values())
+  pose_goal.orientation.w= desired_rot['rot_w']
+  pose_goal.orientation.x= desired_rot['rot_x']
+  pose_goal.orientation.y= desired_rot['rot_y']
+  pose_goal.orientation.z= desired_rot['rot_z']
 
   move_group.set_pose_target(pose_goal)
 
@@ -86,6 +83,8 @@ def main(args):
   robot = moveit_commander.RobotCommander()
   scene = moveit_commander.PlanningSceneInterface()
 
+  add_box(scene,robot)
+
   group_name = "manipulator"
   move_group = moveit_commander.MoveGroupCommander(group_name)
 
@@ -96,14 +95,15 @@ def main(args):
   desired_cart_pos = {'x':args.pos[0], 'y':args.pos[1], 'z':args.pos[2]}
 
   if hasattr(args, 'rot'):
-    desired_rot = {'rot_x':args.rot[0], 'rot_y':args.rot[1], 'rot_z':args.rot[2]}
+    quat = tf.transformations.quaternion_from_euler(args.rot[0],args.rot[1],args.rot[2])
+    desired_rot = {'rot_x':quat[0], 'rot_y':quat[1], 'rot_z':quat[2], 'rot_w':quat[3]}
     go_to_pose_goal(move_group, desired_cart_pos, desired_rot)
   else:
-    desired_rot = {'rot_x':0, 'rot_y':0, 'rot_z':0}
+    quat = tf.transformations.quaternions_from_euler(0,0,0)
+    desired_rot = {'rot_x':quat[0], 'rot_y':quat[1], 'rot_z':quat[2], 'rot_w':quat[3]}
     go_to_pose_goal(move_group, desired_cart_pos, desired_rot)
 
   #adds floor for planning. Needs to be run once on initialization
-  #add_box(scene,robot)
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description="Train or Use the Network?")
