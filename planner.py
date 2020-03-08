@@ -47,7 +47,6 @@ class Planner(object):
         box_pose.pose.position.y=0
         box_pose.pose.position.x=0
         self.scene.add_box(box_name,box_pose,size=(5,5,.01))
-        rospy.sleep(2)
 
     def create_plan(self, plan_file):
         planf = open(plan_file, 'r')
@@ -70,7 +69,7 @@ class Planner(object):
             pose.orientation.z = quat[2]
             pose.orientation.w = quat[3]
             
-            print "waypoint: "+coords[0]+", "+coords[1]+", "+coords[2]
+            # print "waypoint: "+coords[0]+", "+coords[1]+", "+coords[2]
 
             waypoints.append(copy.deepcopy(pose))
 
@@ -96,12 +95,12 @@ def main():
 
     plan, fraction = planner.create_plan(plan_file)
 
-    print " Press any key to display plan"
+    print " Press enter to display plan"
     raw_input()
 
     planner.display_trajectory(plan)
 
-    print " Press any key to run plan"
+    print " Press enter to run plan"
     raw_input()
 
     planner.execute_plan(plan)

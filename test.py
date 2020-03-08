@@ -44,8 +44,6 @@ def add_floor(scene, robot, timeout=4):
   box_pose.pose.position.y=0
   box_pose.pose.position.x=0
   scene.add_box(box_name,box_pose,size=(5,5,.01))
-  
-  rospy.sleep(2)
 
 def display_trajectory(robot, display_trajectory_publisher, plan):
   display_trajectory = moveit_msgs.msg.DisplayTrajectory()
