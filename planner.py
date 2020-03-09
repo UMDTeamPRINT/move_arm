@@ -11,7 +11,7 @@ class Planner(object):
     """Planner"""
     def __init__(self):
         super(Planner, self).__init__()
-        
+
         moveit_commander.roscpp_initialize(sys.argv)
         rospy.init_node('planner', anonymous=True)
 
@@ -28,7 +28,7 @@ class Planner(object):
         planning_frame = move_group.get_planning_frame()
         eef_link = move_group.get_end_effector_link()
         group_names = robot.get_group_names()
-        
+
         self.robot = robot
         self.scene = scene
         self.move_group = move_group
@@ -36,7 +36,7 @@ class Planner(object):
         self.planning_frame = planning_frame
         self.eef_link = eef_link
         self.group_names = group_names
-    
+
     def add_floor(self, timeout=4):
         rospy.sleep(2)
         box_name="floor"
@@ -58,7 +58,7 @@ class Planner(object):
             coords = line.split(" ")
             pose = geometry_msgs.msg.Pose()
             fcoords = [float(i) for i in coords]
-            
+
             pose.position.x = fcoords[0]
             pose.position.y = fcoords[1]
             pose.position.z = fcoords[2]
@@ -68,7 +68,7 @@ class Planner(object):
             pose.orientation.y = quat[1]
             pose.orientation.z = quat[2]
             pose.orientation.w = quat[3]
-            
+
             # print "waypoint: "+coords[0]+", "+coords[1]+", "+coords[2]
 
             waypoints.append(copy.deepcopy(pose))
