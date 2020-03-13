@@ -73,7 +73,8 @@ class Planner(object):
 
             waypoints.append(copy.deepcopy(pose))
 
-        (plan, fraction) = self.move_group.compute_cartesian_path(waypoints, 0.001, 0)
+        (plan, fraction) = self.move_group.compute_cartesian_path(waypoints,
+                                                                  0.0001, 0)
 
         return plan, fraction
 
