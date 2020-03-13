@@ -95,6 +95,7 @@ def main():
 
     plan, fraction = planner.create_plan(plan_file)
 
+    # TODO Figure out why the plan is displayed before this happens.
     print " Press enter to display plan"
     raw_input()
 
